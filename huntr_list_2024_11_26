@@ -1,0 +1,190 @@
+NVIDIA/nvidia-container-toolkit https://github.com/nvidia/nvidia-container-toolkit Go CVE+$1500
+apache/spark https://github.com/apache/spark Scala, Python CVE+$1500
+microsoft/DeepSpeed https://github.com/microsoft/deepspeed Python, C++ CVE+$1500
+huggingface/text-generation-inference https://github.com/huggingface/text-generation-inference Python CVE+$1500
+intel/neural-compressor https://github.com/intel/neural-compressor Python CVE+$1500
+mongodb/mongo-python-driver https://github.com/mongodb/mongo-python-driver Python CVE+$1500
+tensorflow/tensorflow https://github.com/tensorflow/tensorflow C++ CVE+$1500
+huggingface/transformers https://github.com/huggingface/transformers Python CVE+$1500
+pytorch/pytorch https://github.com/pytorch/pytorch Python CVE+$1500
+scikit-learn/scikit-learn https://github.com/scikit-learn/scikit-learn Python CVE+$1500
+keras-team/keras https://github.com/keras-team/keras Python CVE+$1500
+numpy/numpy https://github.com/numpy/numpy Python CVE+$1500
+microsoft/LightGBM https://github.com/microsoft/lightgbm C++ CVE+$1500
+onnx/onnx https://github.com/onnx/onnx Python CVE+$1500
+mlflow/mlflow https://github.com/mlflow/mlflow Python CVE+$1500
+nltk/nltk https://github.com/nltk/nltk Python CVE+$1500
+kubeflow/kubeflow https://github.com/kubeflow/kubeflow TypeScript CVE+$1500
+apache/tvm https://github.com/apache/tvm Python CVE+$1500
+microsoft/onnxruntime https://github.com/microsoft/onnxruntime C++ CVE+$1500
+NVIDIA/TensorRT https://github.com/nvidia/tensorrt C++ CVE+$1500
+tensorflow/serving https://github.com/tensorflow/serving C++ CVE+$1500
+triton-inference-server/server https://github.com/triton-inference-server/server Python CVE+$1500
+tensorflow/tensorboard https://github.com/tensorflow/tensorboard TypeScript CVE+$1500
+huggingface/tokenizers https://github.com/huggingface/tokenizers Rust CVE+$1500
+pytorch/serve https://github.com/pytorch/serve Java CVE+$1500
+aws/sagemaker-python-sdk https://github.com/aws/sagemaker-python-sdk Python CVE+$1500
+tensorflow/tfx https://github.com/tensorflow/tfx Python CVE+$1500
+googleapis/python-aiplatform https://github.com/googleapis/python-aiplatform Python CVE+$1500
+run-llama/llama_index https://github.com/run-llama/llama_index Python CVE+$1500
+google/jax https://github.com/google/jax Python CVE+$1500
+facebookresearch/faiss https://github.com/facebookresearch/faiss C++ CVE+$1500
+facebookresearch/fairseq https://github.com/facebookresearch/fairseq Python CVE+$1500
+deepjavalibrary/djl https://github.com/deepjavalibrary/djl Java CVE+$1500
+microsoft/autogen https://github.com/microsoft/autogen Jupyter Notebook CVE+$1500
+microsoft/promptbench https://github.com/microsoft/promptbench Python CVE+$1500
+ollama/ollama https://github.com/ollama/ollama Go, C CVE+$1500
+apache/airflow https://github.com/apache/airflow Python CVE+$1200
+jupyter/jupyter https://github.com/jupyter/jupyter Python CVE+$1200
+aws/aws-cli https://github.com/aws/aws-cli Python CVE+$1200
+apache/arrow https://github.com/apache/arrow C++ CVE+$1200
+Netflix/metaflow https://github.com/netflix/metaflow Python CVE+$1200
+elastic/elasticsearch-py https://github.com/elastic/elasticsearch-py Python CVE+$1200
+h5py/h5py https://github.com/h5py/h5py Python CVE+$1200
+joblib/joblib https://github.com/joblib/joblib Python CVE+$1200
+deepmind/sonnet https://github.com/deepmind/sonnet Python CVE+$900
+tensorflow/agents https://github.com/tensorflow/agents Python CVE+$900
+scikit-optimize/scikit-optimize https://github.com/scikit-optimize/scikit-optimize Python CVE+$900
+keras-team/keras-tuner https://github.com/keras-team/keras-tuner Python CVE+$900
+infiniflow/ragflow https://github.com/infiniflow/ragflow Python CVE+$0
+feast-dev/feast https://github.com/feast-dev/feast Python CVE+$0
+danny-avila/LibreChat https://github.com/danny-avila/librechat TypeScript, JavaScript CVE+$0
+explodinggradients/ragas https://github.com/explodinggradients/ragas Python CVE+$0
+langgenius/dify https://github.com/langgenius/dify TypeScript, Python CVE+$0
+lm-sys/FastChat https://github.com/lm-sys/fastchat Python CVE+$0
+zilliztech/GPTCache https://github.com/zilliztech/gptcache Python CVE+$0
+AUTOMATIC1111/stable-diffusion-webui https://github.com/automatic1111/stable-diffusion-webui Python, JavaScript CVE+$0
+binary-husky/gpt_academic https://github.com/binary-husky/gpt_academic Python, JavaScript CVE+$0
+invoke-ai/InvokeAI https://github.com/invoke-ai/invokeai TypeScript, Python CVE+$0
+princeton-nlp/SWE-agent https://github.com/princeton-nlp/swe-agent Python CVE+$0
+brycedrennan/imaginAIry https://github.com/brycedrennan/imaginairy Python CVE+$0
+serge-chat/serge https://github.com/serge-chat/serge Python CVE+$0
+eosphoros-ai/DB-GPT https://github.com/eosphoros-ai/db-gpt Python, TypeScript CVE+$0
+reworkd/AgentGPT https://github.com/reworkd/agentgpt Python, TypeScript CVE+$0
+szad670401/HyperLPR https://github.com/szad670401/hyperlpr C++, Python CVE+$0
+pyro-ppl/pyro https://github.com/pyro-ppl/pyro Python CVE+$0
+mlpack/mlpack https://github.com/mlpack/mlpack C++ CVE+$0
+open-mmlab/mmdetection https://github.com/open-mmlab/mmdetection Python CVE+$0
+haotian-liu/LLaVA https://github.com/haotian-liu/llava Python CVE+$0
+polyaxon/polyaxon https://github.com/polyaxon/polyaxon Java, Python CVE+$0
+comfyanonymous/ComfyUI https://github.com/comfyanonymous/comfyui Python CVE+$0
+wandb/openui https://github.com/wandb/openui TypeScript, Python CVE+$0
+TransformerOptimus/SuperAGI https://github.com/transformeroptimus/superagi JavaScript, Python CVE+$0
+Shaunwei/RealChar https://github.com/shaunwei/realchar JavaScript, Python, Swift CVE+$0
+ComposioHQ/composio https://github.com/composiohq/composio Python CVE+$0
+modelscope/agentscope https://github.com/modelscope/agentscope Python CVE+$0
+lightning-ai/pytorch-lightning https://github.com/lightning-ai/pytorch-lightning Python CVE+$0
+mintplex-labs/anything-llm https://github.com/mintplex-labs/anything-llm JavaScript CVE+$0
+allegroai/clearml-server https://github.com/allegroai/clearml-server Python CVE+$0
+langchain-ai/langchain https://github.com/langchain-ai/langchain Python CVE+$0
+langchain-ai/langchainjs https://github.com/langchain-ai/langchainjs JavaScript CVE+$0
+TimDettmers/bitsandbytes https://github.com/timdettmers/bitsandbytes Python CVE+$0
+IST-DASLab/gptq https://github.com/ist-daslab/gptq Python CVE+$0
+man-group/dtale https://github.com/man-group/dtale Python, TypeScript CVE+$0
+boto/s3transfer https://github.com/boto/s3transfer Python CVE+$0
+boto/botocore https://github.com/boto/botocore Python CVE+$0
+urllib3/urllib3 https://github.com/urllib3/urllib3 Python CVE+$0
+sqlalchemy/sqlalchemy https://github.com/sqlalchemy/sqlalchemy Python CVE+$0
+boto/boto3 https://github.com/boto/boto3 Python CVE+$0
+pallets/flask https://github.com/pallets/flask Python CVE+$0
+psf/requests https://github.com/psf/requests Python CVE+$0
+pandas-dev/pandas https://github.com/pandas-dev/pandas Python CVE+$0
+gradio-app/gradio https://github.com/gradio-app/gradio Python CVE+$0
+tiangolo/fastapi https://github.com/tiangolo/fastapi Python CVE+$0
+SeleniumHQ/Selenium https://github.com/seleniumhq/selenium Java CVE+$0
+scrapy/scrapy https://github.com/scrapy/scrapy Python CVE+$0
+dmlc/xgboost https://github.com/dmlc/xgboost C++ CVE+$0
+fastai/fastai https://github.com/fastai/fastai Jupyter Notebook CVE+$0
+ray-project/ray https://github.com/ray-project/ray Python CVE+$0
+explosion/spaCy https://github.com/explosion/spacy Python CVE+$0
+apache/mxnet https://github.com/apache/mxnet C++ CVE+$0
+PaddlePaddle/Paddle https://github.com/paddlepaddle/paddle C++ CVE+$0
+matplotlib/matplotlib https://github.com/matplotlib/matplotlib Python CVE+$0
+bokeh/bokeh https://github.com/bokeh/bokeh Python CVE+$0
+psycopg/psycopg2 https://github.com/psycopg/psycopg2 C CVE+$0
+RaRe-Technologies/gensim https://github.com/rare-technologies/gensim Python CVE+$0
+python-pillow/Pillow https://github.com/python-pillow/pillow Python CVE+$0
+scipy/scipy https://github.com/scipy/scipy Python CVE+$0
+argoproj/argo https://github.com/argoproj/argo Go CVE+$0
+horovod/horovod https://github.com/horovod/horovod Python CVE+$0
+redis/redis-py https://github.com/redis/redis-py Python CVE+$0
+PrefectHQ/prefect https://github.com/prefecthq/prefect Python CVE+$0
+dask/dask https://github.com/dask/dask Python CVE+$0
+iterative/dvc https://github.com/iterative/dvc Python CVE+$0
+mwaskom/seaborn https://github.com/mwaskom/seaborn Python CVE+$0
+ydataai/ydata-profiling https://github.com/ydataai/ydata-profiling Python CVE+$0
+statsmodels/statsmodels https://github.com/statsmodels/statsmodels Python CVE+$0
+EpistasisLab/tpot https://github.com/epistasislab/tpot Python CVE+$0
+numba/numba https://github.com/numba/numba Python CVE+$0
+modin-project/modin https://github.com/modin-project/modin Python CVE+$0
+kedro-org/kedro https://github.com/kedro-org/kedro Python CVE+$0
+pycaret/pycaret https://github.com/pycaret/pycaret Jupyter Notebook CVE+$0
+PyMySQL/PyMySQL https://github.com/pymysql/pymysql Python CVE+$0
+dagster-io/dagster https://github.com/dagster-io/dagster Python CVE+$0
+blue-yonder/tsfresh https://github.com/blue-yonder/tsfresh Jupyter Notebook CVE+$0
+cortexlabs/cortex https://github.com/cortexlabs/cortex Go CVE+$0
+h2oai/h2o-3 https://github.com/h2oai/h2o-3 Jupyter Notebook CVE+$0
+python-visualization/folium https://github.com/python-visualization/folium Python CVE+$0
+scikit-image/scikit-image https://github.com/scikit-image/scikit-image Python CVE+$0
+alteryx/featuretools https://github.com/alteryx/featuretools Python CVE+$0
+chainer/chainer https://github.com/chainer/chainer Python CVE+$0
+dmlc/gluon-cv https://github.com/dmlc/gluon-cv Python CVE+$0
+wandb/wandb https://github.com/wandb/wandb Python CVE+$0
+pachyderm/pachyderm https://github.com/pachyderm/pachyderm Go CVE+$0
+Azure/azure-sdk-for-python https://github.com/azure/azure-sdk-for-python Python CVE+$0
+rapidsai/cudf https://github.com/rapidsai/cudf C++ CVE+$0
+allegroai/clearml https://github.com/allegroai/clearml Python CVE+$0
+vespa-engine/vespa https://github.com/vespa-engine/vespa Java CVE+$0
+geopandas/geopandas https://github.com/geopandas/geopandas Python CVE+$0
+SeldonIO/seldon-core https://github.com/seldonio/seldon-core HTML CVE+$0
+html5lib/html5lib-python https://github.com/html5lib/html5lib-python Python CVE+$0
+opencv/opencv-python https://github.com/opencv/opencv-python Shell CVE+$0
+yhat/ggpy https://github.com/yhat/ggpy Python CVE+$0
+aws/aws-sdk-pandas https://github.com/aws/aws-sdk-pandas Python CVE+$0
+aimhubio/aim https://github.com/aimhubio/aim Python CVE+$0
+flyteorg/flyte https://github.com/flyteorg/flyte Go CVE+$0
+iterative/cml https://github.com/iterative/cml JavaScript CVE+$0
+rapidsai/cuml https://github.com/rapidsai/cuml C++ CVE+$0
+microsoft/hummingbird https://github.com/microsoft/hummingbird Python CVE+$0
+ploomber/ploomber https://github.com/ploomber/ploomber Python CVE+$0
+zenml-io/zenml https://github.com/zenml-io/zenml Python CVE+$0
+dmlc/gluon-nlp https://github.com/dmlc/gluon-nlp Python CVE+$0
+plotly/plotly https://github.com/plotly/plotly R CVE+$0
+kserve/kserve https://github.com/kserve/kserve Python CVE+$0
+uqfoundation/dill https://github.com/uqfoundation/dill Python CVE+$0
+VertaAI/modeldb https://github.com/vertaai/modeldb Java CVE+$0
+feature-engine/feature_engine https://github.com/feature-engine/feature_engine Python CVE+$0
+PyTables/PyTables https://github.com/pytables/pytables Python CVE+$0
+explosion/spacy-transformers https://github.com/explosion/spacy-transformers Python CVE+$0
+guildai/guildai https://github.com/guildai/guildai Python CVE+$0
+LineaLabs/lineapy https://github.com/linealabs/lineapy Jupyter Notebook CVE+$0
+neptune-ai/neptune-client https://github.com/neptune-ai/neptune-client Python CVE+$0
+pymc-devs/pytensor https://github.com/pymc-devs/pytensor Python CVE+$0
+caraml-dev/merlin https://github.com/caraml-dev/merlin Go CVE+$0
+bananaml/banana-python-sdk https://github.com/bananaml/banana-python-sdk Python CVE+$0
+wention/BeautifulSoup4 https://github.com/wention/beautifulsoup4 Python CVE+$0
+jenkins-x/jx https://github.com/jenkins-x/jx Go CVE+$0
+catboost/catboost https://github.com/catboost/catboost Python CVE+$0
+bentoml/BentoML https://github.com/bentoml/bentoml Python CVE+$0
+vllm-project/vllm https://github.com/vllm-project/vllm Python CVE+$0
+pymc-devs/pymc https://github.com/pymc-devs/pymc Python CVE+$0
+autogluon/autogluon https://github.com/autogluon/autogluon Python CVE+$0
+qdrant/qdrant https://github.com/qdrant/qdrant Rust CVE+$0
+berriai/litellm https://github.com/berriai/litellm Python CVE+$0
+imartinez/privategpt https://github.com/imartinez/privategpt Python CVE+$0
+bentoml/openllm https://github.com/bentoml/openllm Python CVE+$0
+mlc-ai/web-llm https://github.com/mlc-ai/web-llm TypeScript CVE+$0
+gaizhenbiao/chuanhuchatgpt https://github.com/gaizhenbiao/chuanhuchatgpt Python CVE+$0
+parisneo/lollms-webui https://github.com/parisneo/lollms-webui Vue CVE+$0
+parisneo/lollms https://github.com/parisneo/lollms Python CVE+$0
+significant-gravitas/autogpt https://github.com/significant-gravitas/autogpt JavaScript CVE+$0
+pathwaycom/llm-app https://github.com/pathwaycom/llm-app Python CVE+$0
+lunary-ai/lunary https://github.com/lunary-ai/lunary TypeScript CVE+$0
+mudler/localai https://github.com/mudler/localai C++ CVE+$0
+stangirard/quivr https://github.com/stangirard/quivr TypeScript CVE+$0
+geekan/metagpt https://github.com/geekan/metagpt Python CVE+$0
+neptune-ai/neptune-client https://github.com/neptune-ai/neptune-client Python CVE+$0
+skops-dev/skops https://github.com/skops-dev/skops Python CVE+$0
+open-webui/open-webui https://github.com/open-webui/open-webui Svelte, Python CVE+$0
+danswer-ai/danswer https://github.com/danswer-ai/danswer Python, TypeScript CVE+$0
+netease-youdao/QAnything https://github.com/netease-youdao/qanything Python, Shell CVE+$0
