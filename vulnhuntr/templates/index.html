@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnhuntr - Python Code Vulnerability Analysis Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/lib/codemirror.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/theme/monokai.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="/static/style.css" rel="stylesheet">
+    <style>
+        .result-card {
+            margin-bottom: 1rem;
+        }
+        .severity-high {
+            color: #dc3545;
+        }
+        .severity-medium {
+            color: #ffc107;
+        }
+        .severity-low {
+            color: #28a745;
+        }
+        .CodeMirror {
+            height: 300px;
+            border: 1px solid #ddd;
+        }
+        #statusBar {
+            display: none;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .report-link {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+        }
+        .status-icon {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+        .nav-tabs {
+            margin-bottom: 15px;
+        }
+        #reportsTab {
+            display: none;
+        }
+        .github-url-info {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e9f7fe;
+            border-radius: 4px;
+            border-left: 4px solid #0d6efd;
+        }
+        /* 进度条样式 */
+        .progress {
+            height: 20px;
+            margin-bottom: 15px;
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        /* 状态卡片样式 */
+        #statusCard {
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            margin-top: 1.5rem;
+        }
+        #statusMessage {
+            margin-bottom: 10px;
+        }
+        /* 按钮样式改进 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn i {
+            margin-right: 5px;
+        }
+        /* 界面统一中文样式 */
+        .card-header {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shield-check"></i> Vulnhuntr
+            </a>
+            <span class="navbar-text text-light">
+                Python Code Vulnerability Analysis Tool
+            </span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="true">分析</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="false">报告</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="repos-tab" data-bs-toggle="tab" data-bs-target="#repos" type="button" role="tab" aria-controls="repos" aria-selected="false">仓库</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content mt-3" id="myTabContent">
+            <div class="tab-pane fade show active" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Analysis Configuration</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="analyzeForm">
+                                    <div class="mb-3">
+                                        <label for="repoPath" class="form-label">仓库路径或 GitHub URL</label>
+                                        <input type="text" class="form-control" id="repoPath" name="repoPath" required 
+                                               placeholder="本地路径或 GitHub URL (例如: https://github.com/user/repo)">
+                                        <div class="github-url-info" id="githubUrlInfo">
+                                            <i class="bi bi-info-circle"></i> GitHub 仓库将被克隆用于分析。
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="analyzePath" class="form-label">分析路径 (可选)</label>
+                                        <input type="text" class="form-control" id="analyzePath" name="analyzePath" 
+                                               placeholder="特定文件或目录路径">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="llmType" class="form-label">LLM 类型</label>
+                                        <select class="form-select" id="llmType" name="llmType">
+                                            <option value="claude">Claude</option>
+                                            <option value="chatgpt">ChatGPT</option>
+                                            <option value="ollama">Ollama</option>
+                                            <option value="deepseek" selected>Deepseek</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                                        <i class="bi bi-search"></i> 开始分析
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div id="statusCard" class="card mt-3" style="display: none;">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0" id="statusTitle">
+                                    <i class="bi bi-hourglass status-icon"></i> 分析进行中
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="progress mb-3">
+                                    <div id="analysisProgress" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                            role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                                </div>
+                                <p id="statusMessage">初始化分析...</p>
+                                <div class="d-flex justify-content-between">
+                                    <div>已分析文件: <span id="filesAnalyzedCount">0</span></div>
+                                    <div>已跳过文件: <span id="filesSkippedCount">0</span></div>
+                                </div>
+                                <div class="mt-2">
+                                    <button id="viewLogsBtn" type="button" class="btn btn-sm btn-outline-secondary d-none" data-task-id="">
+                                        <i class="bi bi-file-text"></i> 查看日志
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-7">
+                        <div id="analysisResults" class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Analysis Results</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="emptyState">
+                                    <div class="text-center py-5">
+                                        <i class="bi bi-file-earmark-code text-muted" style="font-size: 3rem;"></i>
+                                        <p class="mt-3 text-muted">No analysis results yet. Start an analysis to see results here.</p>
+                                    </div>
+                                </div>
+                                <div id="results"></div>
+                                <div id="reportLink" class="report-link" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Available Reports</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="reportsLoading" class="text-center py-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading reports...</p>
+                        </div>
+                        <div id="reportsEmpty" class="text-center py-5" style="display: none;">
+                            <i class="bi bi-folder-x text-muted" style="font-size: 3rem;"></i>
+                            <p class="mt-3 text-muted">No reports found.</p>
+                        </div>
+                        <div id="reportsList" class="list-group"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="repos" role="tabpanel" aria-labelledby="repos-tab">
+                <div class="row mt-3">
+                    <div class="col">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h2><i class="bi bi-folder2"></i> 已克隆的仓库</h2>
+                            <div>
+                                <button id="refreshReposBtn" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-clockwise"></i> 刷新
+                                </button>
+                                <button id="cleanupReposBtn" class="btn btn-warning">
+                                    <i class="bi bi-trash"></i> 清理旧仓库
+                                    <span id="cleanupSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 加载中 -->
+                        <div id="reposLoading" class="text-center py-5">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">加载中...</span>
+                            </div>
+                            <p class="mt-3 text-muted">正在加载仓库列表...</p>
+                        </div>
+                        
+                        <!-- 空状态 -->
+                        <div id="reposEmpty" class="text-center py-5 d-none">
+                            <i class="bi bi-folder2-open" style="font-size: 3rem;"></i>
+                            <p class="mt-3 text-muted">没有克隆的仓库</p>
+                            <p class="text-muted small">在分析选项卡输入GitHub URL开始克隆仓库</p>
+                        </div>
+                        
+                        <!-- 仓库列表 -->
+                        <div id="reposList" class="d-none">
+                            <div class="card">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>仓库名称</th>
+                                                    <th>克隆时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="reposTableBody">
+                                                <!-- 仓库列表动态填充 -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Result Modal -->
+    <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resultModalLabel">Detailed Analysis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="resultModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加日志查看模态框 -->
+    <div class="modal fade" id="logsModal" tabindex="-1" aria-labelledby="logsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logsModalLabel">任务日志</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">日志文件路径: <span id="logFilePath"></span></p>
+                    <pre id="logsModalContent" class="bg-light p-3" style="max-height: 500px; overflow-y: auto; font-size: 0.85rem;"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/lib/codemirror.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/python/python.js"></script>
+    <script>
+        // Check if a string is a GitHub URL
+        function isGitHubUrl(url) {
+            return /^https?:\/\/github\.com\//.test(url) || /^git@github\.com:/.test(url);
+        }
+
+        // Repository path input event listener
+        document.getElementById('repoPath').addEventListener('input', function(e) {
+            const value = e.target.value.trim();
+            const githubUrlInfo = document.getElementById('githubUrlInfo');
+            
+            if (isGitHubUrl(value)) {
+                githubUrlInfo.style.display = 'block';
+            } else {
+                githubUrlInfo.style.display = 'none';
+            }
+        });
+
+        // Get current date and time in a readable format
+        function getFormattedDateTime() {
+            const now = new Date();
+            return now.toLocaleString();
+        }
+
+        // Update the progress bar and status message
+        function updateProgress(progress, message, filesAnalyzed, filesSkipped) {
+            const progressBar = document.getElementById('analysisProgress');
+            const statusMessage = document.getElementById('statusMessage');
+            const filesAnalyzedCount = document.getElementById('filesAnalyzedCount');
+            const filesSkippedCount = document.getElementById('filesSkippedCount');
+            
+            progressBar.style.width = `${progress}%`;
+            statusMessage.textContent = message;
+            
+            if (filesAnalyzed !== undefined) {
+                filesAnalyzedCount.textContent = filesAnalyzed;
+            }
+            
+            if (filesSkipped !== undefined) {
+                filesSkippedCount.textContent = filesSkipped;
+            }
+        }
+
+        // Format vulnerability types for display
+        function formatVulnTypes(vulnTypes) {
+            return vulnTypes.map(type => {
+                const badge = getSeverityBadge(type);
+                return `<span class="badge ${badge}">${type}</span>`;
+            }).join(' ');
+        }
+
+        // Get appropriate badge class based on vulnerability type
+        function getSeverityBadge(vulnType) {
+            const highRiskVulns = ['RCE', 'SQLI', 'CMDI', 'DESERIALIZATION'];
+            const mediumRiskVulns = ['XSS', 'SSRF', 'LFI', 'AFD', 'AFW', 'AFR', 'PATH', 'XXE'];
+            
+            if (highRiskVulns.includes(vulnType)) {
+                return 'bg-danger';
+            } else if (mediumRiskVulns.includes(vulnType)) {
+                return 'bg-warning text-dark';
+            } else {
+                return 'bg-info text-dark';
+            }
+        }
+
+        // Format multiline text for HTML display
+        function formatText(text) {
+            return text.replace(/\n/g, '<br>');
+        }
+
+        // Show detailed result in modal
+        function showDetailedResult(result) {
+            const modalBody = document.getElementById('resultModalBody');
+            const modalTitle = document.getElementById('resultModalLabel');
+            
+            modalTitle.textContent = `Analysis: ${result.file}`;
+            
+            const vulnTypes = formatVulnTypes(result.analysis.vulnerability_types);
+            const severityClass = getSeverityClass(result.analysis.confidence_score);
+            
+            modalBody.innerHTML = `
+                <div class="mb-4">
+                    <h6 class="card-subtitle mb-2 ${severityClass}">
+                        Confidence Score: ${result.analysis.confidence_score}/10
+                    </h6>
+                    <h6 class="card-subtitle mb-2">Vulnerability Types:</h6>
+                    <div class="mb-3">${vulnTypes}</div>
+                </div>
+                
+                <div class="accordion" id="resultAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#analysisResult" aria-expanded="true" aria-controls="analysisResult">
+                                Analysis Result
+                            </button>
+                        </h2>
+                        <div id="analysisResult" class="accordion-collapse collapse show" data-bs-parent="#resultAccordion">
+                            <div class="accordion-body">
+                                ${formatText(result.analysis.analysis)}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#analysisProcess" aria-expanded="false" aria-controls="analysisProcess">
+                                Analysis Process
+                            </button>
+                        </h2>
+                        <div id="analysisProcess" class="accordion-collapse collapse" data-bs-parent="#resultAccordion">
+                            <div class="accordion-body">
+                                ${formatText(result.analysis.scratchpad)}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${result.analysis.poc ? `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#pocCode" aria-expanded="false" aria-controls="pocCode">
+                                Proof of Concept
+                            </button>
+                        </h2>
+                        <div id="pocCode" class="accordion-collapse collapse" data-bs-parent="#resultAccordion">
+                            <div class="accordion-body">
+                                <pre class="bg-dark text-light p-3 rounded"><code>${result.analysis.poc}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${result.analysis.context_code && result.analysis.context_code.length > 0 ? `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#contextCode" aria-expanded="false" aria-controls="contextCode">
+                                Context Code
+                            </button>
+                        </h2>
+                        <div id="contextCode" class="accordion-collapse collapse" data-bs-parent="#resultAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-group">
+                                    ${result.analysis.context_code.map(ctx => `
+                                        <li class="list-group-item">
+                                            <h6>${ctx.name}</h6>
+                                            <p class="text-muted">${ctx.reason}</p>
+                                            <pre class="bg-light p-2 rounded"><code>${ctx.code_line}</code></pre>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('resultModal'));
+            modal.show();
+        }
+
+        // Display analysis results in the list
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            const emptyState = document.getElementById('emptyState');
+            
+            resultsDiv.innerHTML = '';
+            emptyState.style.display = 'none';
+            
+            results.forEach((result, index) => {
+                const card = document.createElement('div');
+                card.className = 'card result-card';
+                
+                const severityClass = getSeverityClass(result.analysis.confidence_score);
+                const vulnTypes = formatVulnTypes(result.analysis.vulnerability_types);
+                
+                card.innerHTML = `
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0">File: ${result.file.split('/').pop()}</h6>
+                        <button class="btn btn-sm btn-outline-primary view-details" data-index="${index}">
+                            <i class="bi bi-eye"></i> Details
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="${severityClass}">
+                                <i class="bi bi-shield-exclamation"></i> Confidence: ${result.analysis.confidence_score}/10
+                            </span>
+                            <span class="text-muted small">${result.file}</span>
+                        </div>
+                        <h6 class="card-subtitle mb-2">Vulnerabilities:</h6>
+                        <div class="mb-3">${vulnTypes}</div>
+                        <h6 class="card-subtitle mb-2">Summary:</h6>
+                        <p class="card-text">${result.analysis.analysis.substring(0, 150)}${result.analysis.analysis.length > 150 ? '...' : ''}</p>
+                    </div>
+                `;
+                
+                resultsDiv.appendChild(card);
+                
+                // Add event listener to view details button
+                card.querySelector('.view-details').addEventListener('click', () => {
+                    showDetailedResult(result);
+                });
+            });
+            
+            // Show empty state if no results
+            if (results.length === 0) {
+                emptyState.style.display = 'block';
+            }
+        }
+        
+        // Function to get severity class based on confidence score
+        function getSeverityClass(confidenceScore) {
+            if (confidenceScore >= 8) {
+                return 'severity-high';
+            } else if (confidenceScore >= 5) {
+                return 'severity-medium';
+            } else {
+                return 'severity-low';
+            }
+        }
+        
+        // Load reports list
+        async function loadReports() {
+            const reportsTab = document.getElementById('reportsTab');
+            const reportsLoading = document.getElementById('reportsLoading');
+            const reportsEmpty = document.getElementById('reportsEmpty');
+            const reportsList = document.getElementById('reportsList');
+            
+            reportsLoading.style.display = 'block';
+            reportsEmpty.style.display = 'none';
+            reportsList.innerHTML = '';
+            
+            try {
+                const response = await fetch('/api/reports');
+                const data = await response.json();
+                
+                reportsLoading.style.display = 'none';
+                
+                if (data.reports && data.reports.length > 0) {
+                    data.reports.forEach(report => {
+                        const reportItem = document.createElement('a');
+                        reportItem.className = 'list-group-item list-group-item-action';
+                        reportItem.href = `/api/reports/${report.filename}`;
+                        reportItem.target = '_blank';
+                        
+                        const createdDate = new Date(report.created);
+                        const fileSizeKB = Math.round(report.size_bytes / 1024);
+                        
+                        reportItem.innerHTML = `
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">${report.filename}</h5>
+                                <small>${createdDate.toLocaleString()}</small>
+                            </div>
+                            <p class="mb-1">Size: ${fileSizeKB} KB</p>
+                        `;
+                        
+                        reportsList.appendChild(reportItem);
+                    });
+                } else {
+                    reportsEmpty.style.display = 'block';
+                }
+            } catch (error) {
+                reportsLoading.style.display = 'none';
+                reportsEmpty.style.display = 'block';
+                reportsEmpty.innerHTML = `
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                    <p class="mt-3 text-muted">Failed to load reports: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Event listener for tab change
+        document.getElementById('reports-tab').addEventListener('click', function() {
+            loadReports();
+        });
+
+        // Form submission handler
+        document.getElementById('analyzeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const repoPath = document.getElementById('repoPath').value.trim();
+            const analyzePath = document.getElementById('analyzePath').value.trim();
+            const llmType = document.getElementById('llmType').value;
+            
+            // Show status bar and reset progress
+            const statusCard = document.getElementById('statusCard');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const reportLink = document.getElementById('reportLink');
+            const emptyState = document.getElementById('emptyState');
+            const resultsDiv = document.getElementById('results');
+            
+            statusCard.style.display = 'block';
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="bi bi-hourglass"></i> 分析中...';
+            reportLink.style.display = 'none';
+            emptyState.style.display = 'none';
+            resultsDiv.innerHTML = '';
+            
+            updateProgress(10, '开始分析...', 0, 0);
+            
+            // Check if it's a GitHub URL
+            if (isGitHubUrl(repoPath)) {
+                updateProgress(15, '正在克隆 GitHub 仓库...', 0, 0);
+            }
+            
+            try {
+                // Start the analysis request
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        repo_path: repoPath,
+                        analyze_path: analyzePath,
+                        llm_type: llmType
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || '分析失败');
+                }
+                
+                const data = await response.json();
+                const taskId = data.task_id;
+                
+                if (taskId) {
+                    // 如果返回了任务ID，开始轮询任务状态
+                    checkTaskStatus(taskId);
+                } else {
+                    throw new Error('未收到有效的任务ID');
+                }
+            } catch (error) {
+                // Update progress to error state
+                updateProgress(100, `错误: ${error.message}`, 0, 0);
+                
+                // Change status icon to error
+                const statusTitle = document.getElementById('statusTitle');
+                statusTitle.innerHTML = '<i class="bi bi-exclamation-triangle status-icon text-danger"></i> 分析失败';
+                
+                // Show error in results area
+                resultsDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5><i class="bi bi-exclamation-triangle"></i> 分析失败</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+                emptyState.style.display = 'none';
+                
+            } finally {
+                // Re-enable the analyze button
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="bi bi-search"></i> 开始分析';
+            }
+        });
+        
+        // Load reports when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show the reports tab if there's a 'tab=reports' in the URL
+            if (window.location.search.includes('tab=reports')) {
+                const reportsTab = document.getElementById('reports-tab');
+                reportsTab.click();
+            }
+        });
+
+        // 当点击仓库选项卡时加载仓库列表
+        document.getElementById('repos-tab').addEventListener('click', function() {
+            loadReposList();
+        });
+        
+        // 加载仓库列表的函数
+        function loadReposList() {
+            const reposLoading = document.getElementById('reposLoading');
+            const reposEmpty = document.getElementById('reposEmpty');
+            const reposList = document.getElementById('reposList');
+            const reposTableBody = document.getElementById('reposTableBody');
+            
+            reposLoading.classList.remove('d-none');
+            reposEmpty.classList.add('d-none');
+            reposList.classList.add('d-none');
+            
+            fetch('/api/repos')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    reposLoading.classList.add('d-none');
+                    
+                    // 清空表格
+                    reposTableBody.innerHTML = '';
+                    
+                    if (data.repos && data.repos.length > 0) {
+                        data.repos.forEach(repo => {
+                            const tr = document.createElement('tr');
+                            
+                            // 创建日期显示
+                            const createdDate = new Date(repo.created);
+                            const formattedDate = createdDate.toLocaleDateString() + ' ' + createdDate.toLocaleTimeString();
+                            
+                            tr.innerHTML = `
+                                <td>${repo.name}</td>
+                                <td>${formattedDate}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-primary analyze-repo" data-repo="${repo.path}">
+                                            <i class="bi bi-search"></i> 分析
+                                        </button>
+                                        <button type="button" class="btn btn-danger delete-repo" data-repo="${repo.name}">
+                                            <i class="bi bi-trash"></i> 删除
+                                        </button>
+                                    </div>
+                                </td>
+                            `;
+                            
+                            reposTableBody.appendChild(tr);
+                        });
+                        
+                        // 显示仓库列表
+                        reposList.classList.remove('d-none');
+                        
+                        // 绑定分析按钮事件
+                        document.querySelectorAll('.analyze-repo').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const repoPath = this.getAttribute('data-repo');
+                                // 使用cloned_repos作为前缀构建完整路径
+                                document.getElementById('repoPath').value = 'cloned_repos/' + repoPath;
+                                // 切换到分析选项卡
+                                document.getElementById('analyze-tab').click();
+                                // 滚动到分析表单
+                                document.getElementById('analyzeForm').scrollIntoView({behavior: 'smooth'});
+                            });
+                        });
+                        
+                        // 绑定删除按钮事件
+                        document.querySelectorAll('.delete-repo').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const repoName = this.getAttribute('data-repo');
+                                if (confirm(`确定要删除仓库 "${repoName}" 吗？`)) {
+                                    deleteRepo(repoName);
+                                }
+                            });
+                        });
+                        
+                    } else {
+                        reposEmpty.classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    reposLoading.classList.add('d-none');
+                    reposEmpty.classList.remove('d-none');
+                    reposEmpty.innerHTML = `
+                        <div class="text-center">
+                            <i class="bi bi-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                            <p class="text-muted">加载仓库列表失败: ${error.message}</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        // 删除仓库的函数
+        function deleteRepo(repoName) {
+            fetch(`/api/repos/${repoName}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                showToast('成功', `仓库 "${repoName}" 已删除`, 'success');
+                loadReposList();
+            })
+            .catch(error => {
+                showToast('错误', `删除仓库失败: ${error.message}`, 'danger');
+            });
+        }
+
+        // 执行仓库清理的函数
+        function cleanupRepos() {
+            const cleanupBtn = document.getElementById('cleanupReposBtn');
+            const cleanupSpinner = document.getElementById('cleanupSpinner');
+            
+            // 禁用按钮并显示加载动画
+            cleanupBtn.disabled = true;
+            cleanupSpinner.classList.remove('d-none');
+            
+            fetch('/api/cloned_repos/cleanup', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                showToast('成功', `清理完成！共删除 ${data.removed_count} 个仓库。`, 'success');
+                loadReposList(); // 重新加载仓库列表
+            })
+            .catch(error => {
+                showToast('错误', `清理仓库失败: ${error.message}`, 'danger');
+            })
+            .finally(() => {
+                // 恢复按钮状态
+                cleanupBtn.disabled = false;
+                cleanupSpinner.classList.add('d-none');
+            });
+        }
+
+        // 轮询任务状态的函数
+        function checkTaskStatus(taskId) {
+            fetch(`/api/tasks/${taskId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP 错误! 状态: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 更新进度条
+                    const progressBar = document.getElementById('analysisProgress');
+                    progressBar.style.width = `${data.progress}%`;
+                    progressBar.setAttribute('aria-valuenow', data.progress);
+                    
+                    // 更新状态消息
+                    const statusMessage = document.getElementById('statusMessage');
+                    statusMessage.textContent = data.message;
+                    
+                    // 更新文件计数
+                    document.getElementById('filesAnalyzedCount').textContent = data.analyzed_files;
+                    document.getElementById('filesSkippedCount').textContent = data.skipped_files;
+                    
+                    // 根据任务状态处理
+                    if (data.status === 'completed') {
+                        // 更改状态图标为成功
+                        const statusTitle = document.getElementById('statusTitle');
+                        statusTitle.innerHTML = '<i class="bi bi-check-circle status-icon text-success"></i> 分析完成';
+                        
+                        // 显示查看日志按钮
+                        const viewLogsBtn = document.getElementById('viewLogsBtn');
+                        viewLogsBtn.setAttribute('data-task-id', taskId);
+                        viewLogsBtn.classList.remove('d-none');
+                        
+                        // 显示结果
+                        displayResults(data.results);
+                        
+                        // 显示报告链接
+                        if (data.report_path) {
+                            const reportLink = document.getElementById('reportLink');
+                            reportLink.style.display = 'block';
+                            reportLink.innerHTML = `
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-file-earmark-text status-icon text-success"></i>
+                                    <div>
+                                        <h5>报告已生成</h5>
+                                        <p class="mb-2">详细报告已保存。</p>
+                                        <a href="/api/reports/${data.report_path.split('/').pop()}" target="_blank" class="btn btn-sm btn-success">
+                                            <i class="bi bi-file-earmark-text"></i> 查看完整报告
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        // 重新启用分析按钮
+                        const analyzeBtn = document.getElementById('analyzeBtn');
+                        analyzeBtn.disabled = false;
+                        analyzeBtn.innerHTML = '<i class="bi bi-search"></i> 开始分析';
+                    } else if (data.status === 'failed') {
+                        // 更改状态图标为错误
+                        const statusTitle = document.getElementById('statusTitle');
+                        statusTitle.innerHTML = '<i class="bi bi-exclamation-triangle status-icon text-danger"></i> 分析失败';
+                        
+                        // 显示查看日志按钮
+                        const viewLogsBtn = document.getElementById('viewLogsBtn');
+                        viewLogsBtn.setAttribute('data-task-id', taskId);
+                        viewLogsBtn.classList.remove('d-none');
+                        
+                        // 在结果区域显示错误
+                        const resultsDiv = document.getElementById('results');
+                        resultsDiv.innerHTML = `
+                            <div class="alert alert-danger">
+                                <h5><i class="bi bi-exclamation-triangle"></i> 分析失败</h5>
+                                <p>${data.message}</p>
+                            </div>
+                        `;
+                        
+                        // 重新启用分析按钮
+                        const analyzeBtn = document.getElementById('analyzeBtn');
+                        analyzeBtn.disabled = false;
+                        analyzeBtn.innerHTML = '<i class="bi bi-search"></i> 开始分析';
+                    } else {
+                        // 如果任务仍在进行中，继续轮询
+                        setTimeout(() => checkTaskStatus(taskId), 1000);
+                    }
+                })
+                .catch(error => {
+                    console.error('获取任务状态时出错:', error);
+                    const statusMessage = document.getElementById('statusMessage');
+                    statusMessage.textContent = '获取任务状态时出错';
+                    
+                    // 重新启用分析按钮
+                    const analyzeBtn = document.getElementById('analyzeBtn');
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.innerHTML = '<i class="bi bi-search"></i> 开始分析';
+                });
+        }
+
+        // 为查看日志按钮添加事件监听器
+        document.getElementById('viewLogsBtn').addEventListener('click', function() {
+            const taskId = this.getAttribute('data-task-id');
+            if (taskId) {
+                viewTaskLogs(taskId);
+            }
+        });
+
+        // 查看任务日志的函数
+        function viewTaskLogs(taskId) {
+            fetch(`/api/tasks/${taskId}/logs`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP 错误! 状态: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 显示日志模态框
+                    const logsModal = new bootstrap.Modal(document.getElementById('logsModal'));
+                    const logsModalContent = document.getElementById('logsModalContent');
+                    const logFilePath = document.getElementById('logFilePath');
+                    
+                    logsModalContent.textContent = data.logs.join('\n');
+                    logFilePath.textContent = data.log_file;
+                    
+                    logsModal.show();
+                })
+                .catch(error => {
+                    console.error('获取任务日志时出错:', error);
+                    alert('获取任务日志时出错: ' + error.message);
+                });
+        }
+
+        // 加载页面后初始化事件处理器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 报告选项卡处理
+            if (window.location.search.includes('tab=reports')) {
+                document.getElementById('reports-tab').click();
+            }
+            
+            // 仓库选项卡按钮事件
+            document.getElementById('refreshReposBtn').addEventListener('click', function() {
+                loadReposList();
+            });
+            
+            document.getElementById('cleanupReposBtn').addEventListener('click', function() {
+                if (confirm('确定要清理旧仓库吗？将只保留最近的仓库。')) {
+                    cleanupRepos();
+                }
+            });
+        });
+
+        // 显示通知提示的函数
+        function showToast(title, message, type) {
+            // 创建Toast元素
+            const toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                const container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(container);
+            }
+            
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header bg-${type} text-white">
+                        <strong class="me-auto">${title}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('toast-container').innerHTML += toastHtml;
+            
+            // 初始化并显示Toast
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, {delay: 3000});
+            toast.show();
+        }
+    </script>
+</body>
+</html> 
